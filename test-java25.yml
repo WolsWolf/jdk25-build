@@ -1,0 +1,29 @@
+
+name: Test Java 25 environment
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main, master]
+    paths:
+      - '.github/workflows/test-java25.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  verify-java:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set up Temurin JDK 25
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '25'
+
+      - name: Verify Java and compiler
+        run: |
+          java -version
+          javac -version
+          test "$(java -XshowSettings:properties -version 2>&1 | awk -F'= ' '/java.specification.version/ {print $2; exit}')" = "25"
+          echo "Java 25 is ready for Gradle builds."
